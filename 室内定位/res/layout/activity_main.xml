@@ -1,0 +1,40 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:background="@drawable/map"
+    tools:context="com.xiyou.location1.MainActivity" >
+
+    
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_world" />
+
+    <TextView
+        android:id="@+id/route1"
+        android:layout_width="10sp"
+        android:layout_height="10sp"
+        android:background="#FFFF6600" 
+        android:layout_marginLeft="80sp"
+        android:layout_marginStart="100sp"
+        android:layout_marginTop="165sp" />
+
+    <TextView
+        android:id="@+id/route2"
+        android:layout_width="15sp"
+        android:layout_height="15sp"
+        android:layout_marginLeft="400sp"
+        android:layout_marginStart="100sp"
+        android:layout_marginTop="500sp"
+        android:background="#FFFF6600" />
+    
+    <ImageView 
+        android:id="@+id/role"
+        android:layout_width="25sp"
+        android:layout_height="25sp"
+        android:background="@drawable/role"
+        android:contentDescription="@string/app_name" />
+
+</FrameLayout>
