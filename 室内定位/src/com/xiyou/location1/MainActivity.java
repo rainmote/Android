@@ -1,6 +1,7 @@
 package com.xiyou.location1;
 
 import android.app.Activity;
+
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
@@ -14,6 +15,10 @@ public class MainActivity extends Activity {
 	private ImageView imageView;
 	private TextView text;
 	private TextView route1,route2;
+//	private WifiManager wm;
+//	private Handler mHandler;
+//	private CalculationPosition calc;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -26,7 +31,7 @@ public class MainActivity extends Activity {
 				
 				int dw = imageView.getDrawable().getBounds().width();
 				int dh = imageView.getDrawable().getBounds().height();
-				
+			
 				
 				int[] img_corrdinates = new int[2];
 				imageView.getLocationInWindow(img_corrdinates);
@@ -51,7 +56,27 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		setContentView(new DisplayDistanceRange(this));
+		//calc = new CalculationPosition(-30, 2.1);
 		
+//		String wserviceName = Context.WIFI_SERVICE;
+//		wm = (WifiManager)getSystemService(wserviceName);
+//		new BroadcastReceiver() {
+//			public void onReceive(Context context, Intent intent) {
+//				List<ScanResult> results = wm.getScanResults();
+//				Collections.sort(results, new Comparator<ScanResult>() {
+//					public int compare(ScanResult a, ScanResult b) {
+//						return b.level - a.level;
+//					}
+//				});
+//				double[] d = new double[3];
+//				for(int i = 0; i < 3; i++) {
+//					d[i] = calc.getRssiPosition(results.get(i).level);
+//				}	
+//			}
+//		};
+//		mHandler = new Handler();
+//		mHandler.post(new TimerProcess());
 	}
 	
 	private void findView() {
@@ -60,6 +85,13 @@ public class MainActivity extends Activity {
 		imageView = (ImageView)findViewById(R.id.imageView1);
 		text = (TextView)findViewById(R.id.text);
 	}
+	
+//	private class TimerProcess implements Runnable {
+//		public void run() {
+//			wm.startScan();
+//			mHandler.postDelayed(this, 3000);
+//		}
+//	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

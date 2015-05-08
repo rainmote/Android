@@ -1,0 +1,35 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.xiyoupostioning.MainActivity" >
+
+    <ImageView 
+        android:id="@+id/backgroundImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/app_name" />
+    
+    <TextView
+        android:id="@+id/route1"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_alignParentTop="false"
+        android:layout_alignStart="@id/backgroundImage"
+        android:layout_alignLeft="@id/backgroundImage"
+        android:layout_alignTop="@id/backgroundImage"
+        android:background="#FFFF6600" />
+   
+    <TextView
+        android:id="@+id/route2"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_alignParentTop="false"
+        android:layout_alignStart="@id/backgroundImage"
+        android:layout_alignLeft="@id/backgroundImage"
+        android:layout_alignTop="@id/backgroundImage"
+        android:background="#FFFF6600" />
+
+</RelativeLayout>
