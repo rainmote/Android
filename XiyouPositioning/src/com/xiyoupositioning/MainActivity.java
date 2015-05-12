@@ -1,5 +1,8 @@
 package com.xiyoupositioning;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -18,15 +21,20 @@ import com.amap.api.maps2d.model.CircleOptions;
 
 public class MainActivity extends Activity {
 	
+	private WifiSniffer wifi;
 	private ImageView backgroundImage;
-	private TextView route1, route2;
+	private TextView route1, route2, route3;
+	private TextView message;
 	private float[] abscissa = new float[32];
 	private float[] ordinate = new float[32];
+	private double scale;
 	
 	private void findView() {
 		backgroundImage = (ImageView)findViewById(R.id.backgroundImage);
 		route1 = (TextView)findViewById(R.id.route1);
 		route2 = (TextView)findViewById(R.id.route2);
+		route3 = (TextView)findViewById(R.id.route3);
+		message = (TextView)findViewById(R.id.message);
 	}
 
 	@Override
@@ -35,14 +43,18 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		findView();
 		
-		abscissa[0] = 500;
-		ordinate[0] = 500;
+		abscissa[0] = 242.66f;
+		ordinate[0] = 371.39f;
+		abscissa[1] = 973.07f;
+		ordinate[1] = 1111.72f;
+		abscissa[2] = 237.10f;
+		ordinate[2] = 1200.08f;
+		scale = 1152/8.7f;
 		
 		backgroundImage.setImageResource(R.drawable.map);
 		backgroundImage.post(new Runnable() {
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				int dw = backgroundImage.getDrawable().getBounds().width();
 				int dh = backgroundImage.getDrawable().getBounds().height();
 				
@@ -59,34 +71,71 @@ public class MainActivity extends Activity {
 				ordinate[0] = (float) (img_coordinates[1]-contentTop+backgroundImage.getHeight()*151.0/618);
 				abscissa[1] = (float) (img_coordinates[0]+backgroundImage.getWidth()*397.0/470);
 				ordinate[1] = (float) (img_coordinates[1]-contentTop+backgroundImage.getHeight()*452.0/618);
+				
+				message.setText(dw+"\t"+dh+"\n"+
+						backgroundImage.getWidth()+"\t"+backgroundImage.getHeight()+"\n"+
+						img_coordinates[0]+"\t"+img_coordinates[1]+"\n"+
+						"dpi:"+densityDPI+"\t"+scale);
 				// route1
 				route1.setX(abscissa[0] - MainActivity.dip2px(MainActivity.this, 5));
 				route1.setY(ordinate[0] - MainActivity.dip2px(MainActivity.this, 5));
 				// route2
 				route2.setX(abscissa[1] - MainActivity.dip2px(MainActivity.this, 5));
 				route2.setY(ordinate[1] - MainActivity.dip2px(MainActivity.this, 5));
-				
-				FrameLayout.LayoutParams flLayoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				RingView view = new RingView(MainActivity.this);
-				MainActivity.this.addContentView(view, flLayoutParams);
-				view.setCenterX(abscissa[0]);
-				view.setCenterY(ordinate[0]);
-				view.setRadius(70);
-				view.invalidate();
-				RingView view2 = new RingView(MainActivity.this);
-				MainActivity.this.addContentView(view2, flLayoutParams);
-				view2.setCenterX(abscissa[1]);
-				view2.setCenterY(ordinate[1]);
-				view2.setRadius(10*1.414f);
-				view2.invalidate();
+				// route3
+				route3.setX(abscissa[2] - MainActivity.dip2px(MainActivity.this, 5));
+				route3.setY(ordinate[2] - MainActivity.dip2px(MainActivity.this, 5));
 			}
 		});
+		
+		FrameLayout.LayoutParams flLayoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		RingView[] view = new RingView[3];
+		view[0] = new RingView(this);
+		view[1] = new RingView(this);
+		view[2] = new RingView(this);
+		this.addContentView(view[0], flLayoutParams);
+		this.addContentView(view[1], flLayoutParams);
+		this.addContentView(view[2], flLayoutParams);
+		view[0].setCenterX(abscissa[0]);
+		view[0].setCenterY(ordinate[1]);
+		view[1].setCenterX(abscissa[1]);
+		view[1].setCenterY(ordinate[1]);		
+		view[2].setCenterX(abscissa[2]);
+		view[2].setCenterY(ordinate[2]);
+		wifi = new WifiSniffer(this, view, scale);
+		wifi.Start();
+//		MainActivity.this.addContentView(view, flLayoutParams);
+//		view.setCenterX(abscissa[0]);
+//		view.setCenterY(ordinate[0]);
+//		view.setRadius(650);
+//		view.invalidate();
+//		RingView view2 = new RingView(MainActivity.this);
+//		MainActivity.this.addContentView(view2, flLayoutParams);
+//		view2.setCenterX(abscissa[1]);
+//		view2.setCenterY(ordinate[1]);
+//		view2.setRadius(500);
+//		view2.invalidate();
+//		RingView view3 = new RingView(MainActivity.this);
+//		MainActivity.this.addContentView(view3, flLayoutParams);
+//		view3.setCenterX(abscissa[2]);
+//		view3.setCenterY(ordinate[2]);
+//		view3.setRadius(500);
+//		view3.invalidate();
 		
 	}
 	
 	public static int dip2px(Context context, float dpValue) {
 		final float scale = context.getResources().getDisplayMetrics().density;
 		return (int)(dpValue * scale + 0.5f);
+	}
+	
+	public void onResume() {
+		super.onResume();
+	}
+	
+	public void onPause() {
+		super.onPause();
+		wifi.Stop();
 	}
 
 	@Override
