@@ -11,13 +11,14 @@ import android.provider.SyncStateContract.Constants;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
-import com.amap.api.maps2d.model.CircleOptions;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class MainActivity extends Activity {
 	
@@ -28,6 +29,11 @@ public class MainActivity extends Activity {
 	private float[] abscissa = new float[32];
 	private float[] ordinate = new float[32];
 	private double scale;
+	private float damping = 2.1f;
+	private int metaRSSI = -30;
+	
+	private SeekBar mDampingBar;
+	private SeekBar mMetaRssiBar;
 	
 	private void findView() {
 		backgroundImage = (ImageView)findViewById(R.id.backgroundImage);
@@ -35,6 +41,41 @@ public class MainActivity extends Activity {
 		route2 = (TextView)findViewById(R.id.route2);
 		route3 = (TextView)findViewById(R.id.route3);
 		message = (TextView)findViewById(R.id.message);
+		
+		mDampingBar = (SeekBar) findViewById(R.id.damping);
+		mDampingBar.setProgress(40);
+		mMetaRssiBar = (SeekBar) findViewById(R.id.metaRssi);
+		mMetaRssiBar.setProgress(50);
+		
+		class Listener implements OnSeekBarChangeListener {
+
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				// TODO Auto-generated method stub
+				if (seekBar == mDampingBar) {
+					damping = (float) (progress/20.0);
+					wifi.setDamping(damping);
+				} else if (seekBar == mMetaRssiBar) {
+					metaRSSI = progress - 100;
+					wifi.setMetaRSSI(metaRSSI);
+				}
+				//message.setText("Damping:"+damping);
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+			}
+		}
+		
+		mDampingBar.setOnSeekBarChangeListener(new Listener());
 	}
 
 	@Override
@@ -71,11 +112,12 @@ public class MainActivity extends Activity {
 				ordinate[0] = (float) (img_coordinates[1]-contentTop+backgroundImage.getHeight()*151.0/618);
 				abscissa[1] = (float) (img_coordinates[0]+backgroundImage.getWidth()*397.0/470);
 				ordinate[1] = (float) (img_coordinates[1]-contentTop+backgroundImage.getHeight()*452.0/618);
-				
-				message.setText(dw+"\t"+dh+"\n"+
-						backgroundImage.getWidth()+"\t"+backgroundImage.getHeight()+"\n"+
-						img_coordinates[0]+"\t"+img_coordinates[1]+"\n"+
-						"dpi:"+densityDPI+"\t"+scale);
+			
+//				message.setText("Canvas Size:"+dw+" x "+dh+"\n"+
+//						"Image Size:"+backgroundImage.getWidth()+" x "+backgroundImage.getHeight()+"\n"+
+//						"Background location:("+img_coordinates[0]+", "+img_coordinates[1]+")\n"+
+//						"Dpi:"+densityDPI+"\n"+
+//						"Scale:"+String.format("%.2f", scale));
 				// route1
 				route1.setX(abscissa[0] - MainActivity.dip2px(MainActivity.this, 5));
 				route1.setY(ordinate[0] - MainActivity.dip2px(MainActivity.this, 5));
@@ -97,12 +139,16 @@ public class MainActivity extends Activity {
 		this.addContentView(view[1], flLayoutParams);
 		this.addContentView(view[2], flLayoutParams);
 		view[0].setCenterX(abscissa[0]);
-		view[0].setCenterY(ordinate[1]);
+		view[0].setCenterY(ordinate[0]);
 		view[1].setCenterX(abscissa[1]);
 		view[1].setCenterY(ordinate[1]);		
 		view[2].setCenterX(abscissa[2]);
 		view[2].setCenterY(ordinate[2]);
-		wifi = new WifiSniffer(this, view, scale);
+		wifi = new WifiSniffer(this, message);
+		wifi.setView(view);
+		wifi.setDamping(damping);
+		wifi.setMetaRSSI(-50);
+		wifi.setScale(scale);
 		wifi.Start();
 //		MainActivity.this.addContentView(view, flLayoutParams);
 //		view.setCenterX(abscissa[0]);
