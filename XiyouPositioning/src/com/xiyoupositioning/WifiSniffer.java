@@ -11,7 +11,10 @@ import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
+import android.widget.Button;
 import android.widget.TextView;
+
+import com.xiyoupositioning.util.sendWifi2Server;
 
 public class WifiSniffer {
 	
@@ -25,10 +28,22 @@ public class WifiSniffer {
 	private double scale;
 	private float damping;
 	private int metaRSSI;
+	private sendWifi2Server sender;
+	private boolean sendRunning = false;
+
 	
+	public boolean isSendRunning() {
+		return sendRunning;
+	}
+
+	public void setSendRunning(boolean sendRunning) {
+		this.sendRunning = sendRunning;
+	}
+
 	public WifiSniffer(Context ctx, final TextView message) {
 		context = ctx;
 		mHandler = new Handler();
+		
 		wm = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
 		wifiReceiver = new BroadcastReceiver() {
 
@@ -41,19 +56,36 @@ public class WifiSniffer {
 					}
 				});
 				try {
-					for(int i = 0; i < 3; ++i) {
-						double rssi = results.get(i).level;
+					sender = new sendWifi2Server();
+					for(int i = 0; i < 1; ++i) {
+						ScanResult route = results.get(i);
+						double rssi = route.level;
 						double n = damping;
 						int A = metaRSSI;
+						
 						float d = (float) Math.pow(Math.E, (A-rssi)*Math.log(10)/(10*n));
 						//view[i].setRadius((float) (d*491/8.7)); // 491 photo width. 8.7 meter width
 						message.setText("Damping:"+damping+"\n"+
-								"Meta RSSI:"+metaRSSI);
-						view[i].setRadius((float) (d*scale));
-						view[i].invalidate();
+								"Meta RSSI:"+metaRSSI+"\n");
+						message.append("BSSID:"+route.BSSID+"\n");
+						message.append("SSID:"+route.SSID+"\n");
+						message.append("level:"+route.level+"\n");
+						message.append("frequency:"+route.frequency+"\n");
+						message.append("capabilities:"+route.capabilities+"\n");		
+						message.append("timestamp:"+route.timestamp+"\n");
+						if(route.BSSID.equalsIgnoreCase("d0:c7:c0:dc:7a:14"))
+						{
+							
+							view[1].setRadius((float) (d*scale));
+							view[1].invalidate();
+						} else if(route.BSSID.equalsIgnoreCase("14:e6:e4:57:81:3c"))
+						{
+							view[2].setRadius((float) (d*scale));
+							view[2].invalidate();
+						}
+						sender.append(route); // send data to server database
 					}
 				} catch(Exception e) { System.out.println(e); }
-	
 			}
 		};
 	}

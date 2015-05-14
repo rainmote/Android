@@ -1,23 +1,21 @@
 package com.xiyoupositioning;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.SyncStateContract.Constants;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class MainActivity extends Activity {
@@ -30,10 +28,13 @@ public class MainActivity extends Activity {
 	private float[] ordinate = new float[32];
 	private double scale;
 	private float damping = 2.1f;
-	private int metaRSSI = -30;
+	private int metaRSSI = -50;
 	
 	private SeekBar mDampingBar;
 	private SeekBar mMetaRssiBar;
+	
+	private Button startBtn;
+	private Button stopBtn;
 	
 	private void findView() {
 		backgroundImage = (ImageView)findViewById(R.id.backgroundImage);
@@ -41,41 +42,75 @@ public class MainActivity extends Activity {
 		route2 = (TextView)findViewById(R.id.route2);
 		route3 = (TextView)findViewById(R.id.route3);
 		message = (TextView)findViewById(R.id.message);
+		startBtn = (Button) findViewById(R.id.startBtn);
+		stopBtn = (Button) findViewById(R.id.stopBtn);
 		
-		mDampingBar = (SeekBar) findViewById(R.id.damping);
-		mDampingBar.setProgress(40);
-		mMetaRssiBar = (SeekBar) findViewById(R.id.metaRssi);
-		mMetaRssiBar.setProgress(50);
+//		mDampingBar = (SeekBar) findViewById(R.id.damping);
+//		mDampingBar.setProgress(40);
+//		mMetaRssiBar = (SeekBar) findViewById(R.id.metaRssi);
+//		mMetaRssiBar.setProgress(50);
 		
-		class Listener implements OnSeekBarChangeListener {
+		
+//		SeekBarListener listener = new SeekBarListener();
+//		mDampingBar.setOnSeekBarChangeListener(listener);
+//		mMetaRssiBar.setOnSeekBarChangeListener(listener);
+		
+		ButtionListener buttonListener = new ButtionListener();
+		startBtn.setOnClickListener(buttonListener);
+		stopBtn.setOnClickListener(buttonListener);
+	}
+	
+	class SeekBarListener implements OnSeekBarChangeListener {
 
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser) {
-				// TODO Auto-generated method stub
-				if (seekBar == mDampingBar) {
-					damping = (float) (progress/20.0);
-					wifi.setDamping(damping);
-				} else if (seekBar == mMetaRssiBar) {
-					metaRSSI = progress - 100;
-					wifi.setMetaRSSI(metaRSSI);
-				}
-				//message.setText("Damping:"+damping);
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress,
+				boolean fromUser) {
+			// TODO Auto-generated method stub
+			if (seekBar == mDampingBar) {
+				damping = (float) (progress/20.0);
+				wifi.setDamping(damping);
+			} else if (seekBar == mMetaRssiBar) {
+				metaRSSI = progress - 100;
+				wifi.setMetaRSSI(metaRSSI);
 			}
 		}
+
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			// TODO Auto-generated method stub
+		}
+	}
+	
+	class ButtionListener implements OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			switch(v.getId())
+			{
+				case R.id.startBtn:
+					if(!wifi.isSendRunning())
+					{
+						startBtn.setText("Running");
+						wifi.setSendRunning(true);
+					}
+					break;
+				case R.id.stopBtn:
+					if(wifi.isSendRunning())
+					{
+						startBtn.setText("Start");
+						wifi.setSendRunning(false);
+					}
+					break;
+			}	
+		}
 		
-		mDampingBar.setOnSeekBarChangeListener(new Listener());
 	}
 
 	@Override
@@ -177,6 +212,7 @@ public class MainActivity extends Activity {
 	
 	public void onResume() {
 		super.onResume();
+		wifi.Start();
 	}
 	
 	public void onPause() {
