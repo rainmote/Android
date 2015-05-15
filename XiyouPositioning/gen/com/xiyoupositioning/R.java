@@ -27,9 +27,10 @@ public final class R {
         public static final int role=0x7f020002;
     }
     public static final class id {
-        public static final int action_settings=0x7f080007;
+        public static final int action_settings=0x7f080008;
         public static final int backgroundImage=0x7f080000;
-        public static final int message=0x7f080006;
+        public static final int distance=0x7f080006;
+        public static final int message=0x7f080007;
         public static final int route1=0x7f080001;
         public static final int route2=0x7f080002;
         public static final int route3=0x7f080003;

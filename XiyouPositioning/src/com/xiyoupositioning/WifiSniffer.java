@@ -36,14 +36,24 @@ public class WifiSniffer {
 		return sendRunning;
 	}
 
-	public void setSendRunning(boolean sendRunning) {
+	public void setSendRunning(boolean sendRunning, String distance) {
 		this.sendRunning = sendRunning;
+		if(this.sendRunning) {
+			if(distance == null || distance.isEmpty()) {
+				sender.setDistance(0);
+			} else {
+				sender.setDistance(Double.valueOf(distance));
+			}
+			sender.start();
+		} else {
+			sender.stop();
+		}
 	}
 
 	public WifiSniffer(Context ctx, final TextView message) {
 		context = ctx;
 		mHandler = new Handler();
-		
+		sender = new sendWifi2Server();
 		wm = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
 		wifiReceiver = new BroadcastReceiver() {
 
@@ -56,8 +66,7 @@ public class WifiSniffer {
 					}
 				});
 				try {
-					sender = new sendWifi2Server();
-					for(int i = 0; i < 1; ++i) {
+					for(int i = 0; i < 3; ++i) {
 						ScanResult route = results.get(i);
 						double rssi = route.level;
 						double n = damping;
@@ -65,17 +74,19 @@ public class WifiSniffer {
 						
 						float d = (float) Math.pow(Math.E, (A-rssi)*Math.log(10)/(10*n));
 						//view[i].setRadius((float) (d*491/8.7)); // 491 photo width. 8.7 meter width
-						message.setText("Damping:"+damping+"\n"+
-								"Meta RSSI:"+metaRSSI+"\n");
-						message.append("BSSID:"+route.BSSID+"\n");
-						message.append("SSID:"+route.SSID+"\n");
-						message.append("level:"+route.level+"\n");
-						message.append("frequency:"+route.frequency+"\n");
-						message.append("capabilities:"+route.capabilities+"\n");		
-						message.append("timestamp:"+route.timestamp+"\n");
-						if(route.BSSID.equalsIgnoreCase("d0:c7:c0:dc:7a:14"))
+						
+						if(route.BSSID.equalsIgnoreCase("c8:3a:35:20:bb:68")) {
+							message.setText("Damping:"+damping+"\n"+
+									"Meta RSSI:"+metaRSSI+"\n");
+							message.append("BSSID:"+route.BSSID+"\n");
+							message.append("SSID:"+route.SSID+"\n");
+							message.append("level:"+route.level+"\n");
+							message.append("frequency:"+route.frequency+"\n");		
+							message.append("timestamp:"+route.timestamp+"\n");
+							view[0].setRadius((float) (d*scale));
+							view[0].invalidate();
+						} else if(route.BSSID.equalsIgnoreCase("d0:c7:c0:dc:7a:14"))
 						{
-							
 							view[1].setRadius((float) (d*scale));
 							view[1].invalidate();
 						} else if(route.BSSID.equalsIgnoreCase("14:e6:e4:57:81:3c"))

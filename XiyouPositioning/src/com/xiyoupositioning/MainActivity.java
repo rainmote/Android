@@ -12,6 +12,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -36,6 +37,8 @@ public class MainActivity extends Activity {
 	private Button startBtn;
 	private Button stopBtn;
 	
+	private EditText distance;
+	
 	private void findView() {
 		backgroundImage = (ImageView)findViewById(R.id.backgroundImage);
 		route1 = (TextView)findViewById(R.id.route1);
@@ -44,7 +47,7 @@ public class MainActivity extends Activity {
 		message = (TextView)findViewById(R.id.message);
 		startBtn = (Button) findViewById(R.id.startBtn);
 		stopBtn = (Button) findViewById(R.id.stopBtn);
-		
+		distance = (EditText) findViewById(R.id.distance);
 //		mDampingBar = (SeekBar) findViewById(R.id.damping);
 //		mDampingBar.setProgress(40);
 //		mMetaRssiBar = (SeekBar) findViewById(R.id.metaRssi);
@@ -98,14 +101,14 @@ public class MainActivity extends Activity {
 					if(!wifi.isSendRunning())
 					{
 						startBtn.setText("Running");
-						wifi.setSendRunning(true);
+						wifi.setSendRunning(true, distance.getText().toString());
 					}
 					break;
 				case R.id.stopBtn:
 					if(wifi.isSendRunning())
 					{
 						startBtn.setText("Start");
-						wifi.setSendRunning(false);
+						wifi.setSendRunning(false, "");
 					}
 					break;
 			}	
